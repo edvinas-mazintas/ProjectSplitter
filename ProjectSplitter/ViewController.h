@@ -9,6 +9,13 @@
 
 @interface ViewController : NSViewController
 
+@property (weak) IBOutlet NSButton *chooseFolderButton;
+@property (weak) IBOutlet NSTextField *pathToFolder;
+@property (unsafe_unretained) IBOutlet NSTextView *editorVersions;
+
+@property (weak) IBOutlet NSButton *nukeLibrary;
+@property (weak) IBOutlet NSButton *nukeCacheFolders;
+
 
 @end
 
