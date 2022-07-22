@@ -706,14 +706,14 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="264"/>
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="312"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1v7-NT-Wn1">
-                                <rect key="frame" x="20" y="48" width="440" height="196"/>
+                                <rect key="frame" x="20" y="48" width="440" height="244"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4yV-Gl-bfB">
-                                        <rect key="frame" x="0.0" y="175" width="440" height="21"/>
+                                        <rect key="frame" x="0.0" y="223" width="440" height="21"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ILw-fn-28h">
                                                 <rect key="frame" x="-7" y="-6" width="122" height="32"/>
@@ -743,6 +743,26 @@
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PWg-9E-TK8">
+                                        <rect key="frame" x="-2" y="198" width="103" height="18"/>
+                                        <buttonCell key="cell" type="check" title="Nuke Library" bezelStyle="regularSquare" imagePosition="left" inset="2" id="c5U-CS-XVu">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="nukeLibraryChecked:" target="XfG-lQ-9wD" id="bxa-pS-2fL"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lCh-23-NCw">
+                                        <rect key="frame" x="-2" y="174" width="160" height="18"/>
+                                        <buttonCell key="cell" type="check" title="Nuke &quot;Cache&quot; Folders" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ZLe-wK-BYw">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="nukeCacheFoldersChecked:" target="XfG-lQ-9wD" id="kob-dD-OQ8"/>
+                                        </connections>
+                                    </button>
                                     <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E4i-Pt-WMf">
                                         <rect key="frame" x="0.0" y="0.0" width="440" height="167"/>
                                         <clipView key="contentView" drawsBackground="NO" id="xD7-Va-SuJ">
@@ -775,13 +795,16 @@
                                     <constraint firstAttribute="trailing" secondItem="4yV-Gl-bfB" secondAttribute="trailing" id="9jQ-Wz-Ihz"/>
                                     <constraint firstAttribute="bottom" secondItem="E4i-Pt-WMf" secondAttribute="bottom" id="IXb-PM-IPc"/>
                                     <constraint firstItem="E4i-Pt-WMf" firstAttribute="leading" secondItem="1v7-NT-Wn1" secondAttribute="leading" id="l1A-KQ-DqM"/>
-                                    <constraint firstAttribute="trailing" secondItem="E4i-Pt-WMf" secondAttribute="trailing" id="op0-CX-eqO"/>
                                 </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
@@ -793,6 +816,9 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="onClone:" target="XfG-lQ-9wD" id="p7w-yc-BSe"/>
+                                </connections>
                             </button>
                         </subviews>
                         <constraints>
@@ -805,12 +831,14 @@
                     <connections>
                         <outlet property="ChooseFolderButton" destination="ILw-fn-28h" id="qDL-9f-mbY"/>
                         <outlet property="editorVersions" destination="Gmw-Xd-QqX" id="1F3-nM-Sy2"/>
+                        <outlet property="nukeCacheFolders" destination="lCh-23-NCw" id="6Hg-bc-uYL"/>
+                        <outlet property="nukeLibrary" destination="PWg-9E-TK8" id="rKm-iW-nyq"/>
                         <outlet property="pathToFolder" destination="CLc-Aq-Qcj" id="yQx-V2-dvQ"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="654.5"/>
+            <point key="canvasLocation" x="75" y="654"/>
         </scene>
     </scenes>
 </document>
