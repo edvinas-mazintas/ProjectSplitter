@@ -725,10 +725,10 @@
                                                     <action selector="onClick:" target="XfG-lQ-9wD" id="WFI-La-ACl"/>
                                                 </connections>
                                             </button>
-                                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CLc-Aq-Qcj" userLabel="FolderPathTextField">
+                                            <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CLc-Aq-Qcj" userLabel="FolderPathTextField">
                                                 <rect key="frame" x="116" y="0.0" width="324" height="21"/>
-                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="/Path/To/Folder" drawsBackground="YES" id="ItZ-vJ-TQQ">
-                                                    <font key="font" usesAppearanceFont="YES"/>
+                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" title="/Path/To/Folder" drawsBackground="YES" id="ItZ-vJ-TQQ">
+                                                    <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -811,7 +811,7 @@
                             </stackView>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Pl9-nx-4aZ">
                                 <rect key="frame" x="394" y="13" width="70" height="32"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES"/>
                                 <buttonCell key="cell" type="push" title="Clone" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Uyi-zd-Qqd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -837,6 +837,7 @@
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController representsSharedInstance="YES" id="joi-Wv-cvs"/>
             </objects>
             <point key="canvasLocation" x="75" y="654"/>
         </scene>

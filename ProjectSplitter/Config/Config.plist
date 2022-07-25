@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CacheFolders</key>
+	<array>
+		<string>ScriptAssemblies</string>
+		<string>TempArtifacts</string>
+		<string>Artifacts</string>
+		<string>Bee</string>
+		<string>Il2cppBuildCache</string>
+		<string>ShaderCache</string>
+		<string>PackageCache</string>
+	</array>
+	<key>LibraryName</key>
+	<string>Library</string>
+</dict>
+</plist>
