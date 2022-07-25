@@ -12,6 +12,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _foldersToExclude = [self readFoldersToExclude];
+    // Set initial tooltip path Text Field value
+    [self setPathTextFieldTooltip:[_pathToFolder stringValue]];
     
     // Do any additional setup after loading the view.
     
@@ -23,30 +26,53 @@
     // Update the view, if already loaded.
 }
 
-- (IBAction)onClick:(NSButton *)sender {
+- (void) setPathTextFieldTooltip: (NSString *) string {
+    [_pathToFolder setToolTip:string];
+}
+
+- (NSOpenPanel *)getOpenPanel:(NSString *) title  {
     NSOpenPanel* panel = [NSOpenPanel openPanel];
-    [panel setTitle: @"Choose Project Folder"];
+    [panel setTitle: title];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setAllowsMultipleSelection: NO];
+    return panel;
+}
+
+- (void) openDirectorySelectionPanel {
+    NSOpenPanel * selectedDirectory = [self getOpenPanel: @"Choose Project Folder"];
     
-    [panel beginWithCompletionHandler:^(NSInteger result){
+    [selectedDirectory beginWithCompletionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            NSURL* folderURL = [[panel URLs] objectAtIndex:0];
-            NSLog(@"%@", folderURL);
-            NSString *path = [folderURL absoluteString];
-            path = [path substringFromIndex:7];
+            self -> _folderURL = [[selectedDirectory URLs] objectAtIndex:0];
             
-            [_pathToFolder setStringValue: path];
+            self->_path = [self -> _folderURL absoluteString];
+            
+            self->_path = [self->_path substringFromIndex:7];
+            
+            [self->_pathToFolder setStringValue: self->_path];
+            
+            [self setPathTextFieldTooltip: self->_path];
         }
     }];
+}
+
+- (IBAction)onClick:(NSButton *)sender {
+    [self openDirectorySelectionPanel];
 }
 
 - (NSString *)removeNewLines:(NSString *)editorVersionsString {
     return [editorVersionsString stringByReplacingOccurrencesOfString:@"[\r\n]+" withString:@"\n" options:NSRegularExpressionSearch range:NSMakeRange(0, editorVersionsString.length)];
 }
 
+- (NSArray *)filterArrayUsingLastPathComponent:(NSMutableArray *)fileURLS foldersToExclude:(NSMutableArray *)foldersToExclude {
+    return [fileURLS filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"!(lastPathComponent) IN %@", foldersToExclude]];
+}
+
 - (IBAction)onClone:(NSButton *)sender {
+    
+    __block NSError *error;
+    
     
     if(![_editorVersions.string isEqual: @""] && _editorVersions.string.length != 0){
         NSString *editorVersionsString = [_editorVersions string];
@@ -55,20 +81,135 @@
         
         NSArray *editorVersions = [editorVersionsString componentsSeparatedByString: @"\n"];
         
-        for(int i = 0; i < [editorVersions count]; i++){
-            NSLog(@"%@",editorVersions[i]);
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        __block NSURL* outputURL;
+        
+        NSOpenPanel* selectedDirectory = [self getOpenPanel:@"Choose Output Folder"];
+        
+        NSMutableArray *baseFolderURLS;
+        
+        if (!baseFolderURLS) {
+            baseFolderURLS = [[NSMutableArray alloc] init];
+        }
+        
+        [selectedDirectory beginWithCompletionHandler:^(NSInteger result){
+            if (result == NSModalResponseOK) {
+                outputURL = [[selectedDirectory URLs] objectAtIndex:0];
+                
+                NSArray *theFiles = [fileManager contentsOfDirectoryAtURL:self->_folderURL includingPropertiesForKeys:nil options:0 error:nil];
+                NSArray *libraryFiles = [fileManager contentsOfDirectoryAtURL:[self->_folderURL URLByAppendingPathComponent:@"Library"] includingPropertiesForKeys:nil options:0 error:nil];
+                
+                if(libraryFiles == NULL){
+                    FilterOption = NO_FILTERING;
+                }
+                
+                NSMutableArray *fileURLS = [theFiles mutableCopy];
+                NSArray *filteredURLS;
+                
+                
+                NSMutableArray *arr = [NSMutableArray array];
+                [arr addObject:@"Library"];
+                
+                NSLog(@"%@", arr);
+                
+                switch (FilterOption) {
+                    case NO_FILTERING:
+                        filteredURLS = fileURLS;
+                        break;
+                    case FILTER_LIBRARY:
+                        filteredURLS = [self filterArrayUsingLastPathComponent:fileURLS foldersToExclude:arr];
+                        break;
+                    case FILTER_CONTENTS_OF_LIBRARY:
+                        filteredURLS = [self filterArrayUsingLastPathComponent:fileURLS foldersToExclude:self->_foldersToExclude];
+                        break;
+                }
+                
+                for(NSString* version in editorVersions){
+                    NSURL* url = [outputURL URLByAppendingPathComponent: [self->_folderURL lastPathComponent]];
+                    NSMutableString* lastPathComponent = [[self->_folderURL lastPathComponent] mutableCopy];
+                    [lastPathComponent appendString: @"_"];
+                    [lastPathComponent appendString: version];
+                    
+                    url = [url URLByAppendingPathComponent:lastPathComponent];
+                    [baseFolderURLS addObject:url];
+                    
+                    if ([fileManager fileExistsAtPath: url.path ]) {
+                        [fileManager removeItemAtURL:url error:nil];
+                    }
+                    
+                    if(![fileManager createDirectoryAtPath: url.path withIntermediateDirectories:YES attributes:nil error:&error]) {
+                        NSLog(@"Failed to create directory \"%@\". Error: %@", url, error);
+                    }
+                }
+                
+                NSLog(@"%@", filteredURLS);
+                
+                for(NSURL *baseURL in baseFolderURLS){
+                    for(int i = 0; i < [filteredURLS count]; i++){
+                        NSURL *URLWithComponenent = [baseURL URLByAppendingPathComponent:[filteredURLS[i] lastPathComponent]];
+
+                        if ([fileManager fileExistsAtPath: URLWithComponenent.path ]) {
+                            [fileManager removeItemAtURL:URLWithComponenent error:nil];
+                        }
+
+                        if([fileManager copyItemAtURL:filteredURLS[i] toURL: URLWithComponenent error: &error]){
+                            NSLog (@"File copied succesfully");
+                        }else{
+                            NSLog (@"File copy failed");
+                        }
+                    }
+                }
+            }
+        }];
+        
+        if(error){
+            [self logError:error stringToLog:@"Error copying file"];
         }
     }
-    
 }
 
 - (IBAction)nukeLibraryChecked:(NSButton *)sender {
     _nukeCacheFolders.enabled = !_nukeLibrary.state;
+    FilterOption = FILTER_LIBRARY;
 }
-
 
 - (IBAction)nukeCacheFoldersChecked:(NSButton *)sender {
     _nukeLibrary.enabled = !_nukeCacheFolders.state;
+    FilterOption = FILTER_CONTENTS_OF_LIBRARY;
+}
+
+- (void)logError:(NSError *)error stringToLog:(NSString *) string {
+    NSLog(@"%@", string);
+    NSLog(@"%@", error);
+}
+
+- (NSMutableArray*)readFoldersToExclude{
+    NSError *dataError;
+    NSError *serializationError;
+    
+    NSString *key = @"CacheFolders";
+    
+    NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:@"Config" withExtension:@"plist"];
+    NSData *data = [NSData dataWithContentsOfURL:url options:0 error:&dataError];
+    
+    NSDictionary *dictionary = [NSPropertyListSerialization propertyListWithData:data options:0 format:nil error:&serializationError];
+    
+    NSMutableArray *folderNames= [dictionary valueForKeyPath: key];
+    
+    if (folderNames == NULL) {
+        [self logError:nil stringToLog:@"Failed to read key \"CacheFolders\" from plist"];
+    }
+    
+    if(dataError){
+        [self logError:dataError stringToLog:@"Failed to read data from URL"];
+    }
+    
+    if(serializationError){
+        [self logError:serializationError stringToLog:@"Failed to serialize plist"];
+    }
+    
+    return folderNames;
 }
 
 @end

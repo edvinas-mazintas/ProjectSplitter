@@ -7,15 +7,26 @@
 
 #import <Cocoa/Cocoa.h>
 
+enum
+{
+    NO_FILTERING,
+    FILTER_LIBRARY,
+    FILTER_CONTENTS_OF_LIBRARY
+} FilterOption;
+
 @interface ViewController : NSViewController
 
 @property (weak) IBOutlet NSButton *chooseFolderButton;
 @property (weak) IBOutlet NSTextField *pathToFolder;
-@property (unsafe_unretained) IBOutlet NSTextView *editorVersions;
-
 @property (weak) IBOutlet NSButton *nukeLibrary;
 @property (weak) IBOutlet NSButton *nukeCacheFolders;
+@property (unsafe_unretained) IBOutlet NSTextView *editorVersions;
+@property NSString *path;
+@property NSURL *folderURL;
+@property NSMutableArray *foldersToExclude;
 
+- (void) setPathTextFieldTooltip: (NSString *) string;
+- (void) openDirectorySelectionPanel;
 
 @end
 
