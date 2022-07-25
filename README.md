@@ -1,6 +1,6 @@
 # ProjectSplitter
 
-A tool to clone a Unity project to seperate folders while excluding specific folders.
+A tool to clone a Unity project to separate folders while excluding specific folders.
 - "Choose Folder" - click to choose directory of project
 - "Nuke Library" - check to exclude "Library"
 - "Nuke "Cache Folders"" - check to exclude folders defined in "Config.plist"
