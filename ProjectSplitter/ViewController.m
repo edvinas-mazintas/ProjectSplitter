@@ -13,17 +13,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _foldersToExclude = [self readFoldersToExclude];
-    // Set initial tooltip path Text Field value
     [self setPathTextFieldTooltip:[_pathToFolder stringValue]];
-    
-    // Do any additional setup after loading the view.
-    
 }
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
-
-    // Update the view, if already loaded.
 }
 
 - (void) setPathTextFieldTooltip: (NSString *) string {
@@ -45,48 +39,74 @@
     [selectedDirectory beginWithCompletionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
             self -> _folderURL = [[selectedDirectory URLs] objectAtIndex:0];
-            
             self->_path = [self -> _folderURL absoluteString];
-            
             self->_path = [self->_path substringFromIndex:7];
-            
             [self->_pathToFolder setStringValue: self->_path];
-            
             [self setPathTextFieldTooltip: self->_path];
         }
     }];
 }
 
-- (IBAction)onClick:(NSButton *)sender {
+- (IBAction)onClickInputButton:(NSButton *)sender {
     [self openDirectorySelectionPanel];
 }
 
-- (NSString *)removeNewLines:(NSString *)editorVersionsString {
-    return [editorVersionsString stringByReplacingOccurrencesOfString:@"[\r\n]+" withString:@"\n" options:NSRegularExpressionSearch range:NSMakeRange(0, editorVersionsString.length)];
+- (NSString *)removeNewLines:(NSString *)string {
+    return [string stringByReplacingOccurrencesOfString:@"[\r\n]+" withString:@"\n" options:NSRegularExpressionSearch range:NSMakeRange(0, string.length)];
 }
 
 - (NSArray *)filterArrayUsingLastPathComponent:(NSMutableArray *)fileURLS foldersToExclude:(NSMutableArray *)foldersToExclude {
     return [fileURLS filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"!(lastPathComponent) IN %@", foldersToExclude]];
 }
 
-- (IBAction)onClone:(NSButton *)sender {
-    
+static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMutableArray *fileURLS, NSArray **filteredURLS) {
+    switch (FilterOption) {
+        case NO_FILTERING:
+            *filteredURLS = fileURLS;
+            break;
+        case FILTER_LIBRARY:
+            *filteredURLS = [object filterArrayUsingLastPathComponent:fileURLS foldersToExclude:arr];
+            break;
+        case FILTER_CONTENTS_OF_LIBRARY:
+            *filteredURLS = [object filterArrayUsingLastPathComponent:fileURLS foldersToExclude:object->_foldersToExclude];
+            break;
+    }
+}
+
+- (void)removeItemIfExistsAtURL:(NSFileManager *)fileManager url:(NSURL *)url {
+    if ([fileManager fileExistsAtPath: url.path]) {
+        [fileManager removeItemAtURL:url error:nil];
+    }
+}
+
+- (void)createBaseDirectories:(NSMutableArray *)baseFolderURLS editorVersions:(NSArray *)editorVersions error:(NSError **)error fileManager:(NSFileManager *)fileManager outputURL:(NSURL *)outputURL {
+    for(NSString* version in editorVersions){
+        NSURL* url = [outputURL URLByAppendingPathComponent: [self->_folderURL lastPathComponent]];
+        NSMutableString* lastPathComponent = [[self->_folderURL lastPathComponent] mutableCopy];
+        [lastPathComponent appendString: @"_"];
+        [lastPathComponent appendString: version];
+        
+        url = [url URLByAppendingPathComponent:lastPathComponent];
+        [baseFolderURLS addObject:url];
+        
+        [self removeItemIfExistsAtURL:fileManager url:url];
+        
+        if(![fileManager createDirectoryAtPath: url.path withIntermediateDirectories:YES attributes:nil error:error]) {
+            [self logError:*error stringToLog:@"Failed to create directory"];
+        }
+    }
+}
+
+- (IBAction)onClickOutputButton:(NSButton *)sender {
     __block NSError *error;
     
-    
-    if(![_editorVersions.string isEqual: @""] && _editorVersions.string.length != 0){
-        NSString *editorVersionsString = [_editorVersions string];
-        
-        editorVersionsString = [self removeNewLines:editorVersionsString];
-        
-        NSArray *editorVersions = [editorVersionsString componentsSeparatedByString: @"\n"];
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        
+    if([_editorVersions.string isNotEqualTo: @""] && _editorVersions.string.length != 0){
         __block NSURL* outputURL;
-        
+        NSString *editorVersionsString = [_editorVersions string];
+        editorVersionsString = [self removeNewLines:editorVersionsString];
+        NSArray *editorVersions = [editorVersionsString componentsSeparatedByString: @"\n"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
         NSOpenPanel* selectedDirectory = [self getOpenPanel:@"Choose Output Folder"];
-        
         NSMutableArray *baseFolderURLS;
         
         if (!baseFolderURLS) {
@@ -94,7 +114,7 @@
         }
         
         [selectedDirectory beginWithCompletionHandler:^(NSInteger result){
-            if (result == NSModalResponseOK) {
+            if (result == NSModalResponseOK && self->_folderURL != NULL) {
                 outputURL = [[selectedDirectory URLs] objectAtIndex:0];
                 
                 NSArray *theFiles = [fileManager contentsOfDirectoryAtURL:self->_folderURL includingPropertiesForKeys:nil options:0 error:nil];
@@ -106,57 +126,27 @@
                 
                 NSMutableArray *fileURLS = [theFiles mutableCopy];
                 NSArray *filteredURLS;
-                
-                
                 NSMutableArray *arr = [NSMutableArray array];
                 [arr addObject:@"Library"];
                 
-                NSLog(@"%@", arr);
+                updateFilterOption(self, arr, fileURLS, &filteredURLS);
                 
-                switch (FilterOption) {
-                    case NO_FILTERING:
-                        filteredURLS = fileURLS;
-                        break;
-                    case FILTER_LIBRARY:
-                        filteredURLS = [self filterArrayUsingLastPathComponent:fileURLS foldersToExclude:arr];
-                        break;
-                    case FILTER_CONTENTS_OF_LIBRARY:
-                        filteredURLS = [self filterArrayUsingLastPathComponent:fileURLS foldersToExclude:self->_foldersToExclude];
-                        break;
-                }
-                
-                for(NSString* version in editorVersions){
-                    NSURL* url = [outputURL URLByAppendingPathComponent: [self->_folderURL lastPathComponent]];
-                    NSMutableString* lastPathComponent = [[self->_folderURL lastPathComponent] mutableCopy];
-                    [lastPathComponent appendString: @"_"];
-                    [lastPathComponent appendString: version];
-                    
-                    url = [url URLByAppendingPathComponent:lastPathComponent];
-                    [baseFolderURLS addObject:url];
-                    
-                    if ([fileManager fileExistsAtPath: url.path ]) {
-                        [fileManager removeItemAtURL:url error:nil];
-                    }
-                    
-                    if(![fileManager createDirectoryAtPath: url.path withIntermediateDirectories:YES attributes:nil error:&error]) {
-                        NSLog(@"Failed to create directory \"%@\". Error: %@", url, error);
-                    }
-                }
-                
-                NSLog(@"%@", filteredURLS);
+                [self createBaseDirectories:baseFolderURLS editorVersions:editorVersions error:&error fileManager:fileManager outputURL:outputURL];
                 
                 for(NSURL *baseURL in baseFolderURLS){
                     for(int i = 0; i < [filteredURLS count]; i++){
                         NSURL *URLWithComponenent = [baseURL URLByAppendingPathComponent:[filteredURLS[i] lastPathComponent]];
 
-                        if ([fileManager fileExistsAtPath: URLWithComponenent.path ]) {
-                            [fileManager removeItemAtURL:URLWithComponenent error:nil];
-                        }
+                        
+                        [self removeItemIfExistsAtURL:fileManager url:URLWithComponenent];
+//                        if ([fileManager fileExistsAtPath: URLWithComponenent.path]) {
+//                            [fileManager removeItemAtURL:URLWithComponenent error:nil];
+//                        }
 
                         if([fileManager copyItemAtURL:filteredURLS[i] toURL: URLWithComponenent error: &error]){
-                            NSLog (@"File copied succesfully");
+                            // NSLog (@"File copied succesfully");
                         }else{
-                            NSLog (@"File copy failed");
+                            // NSLog (@"File copy failed");
                         }
                     }
                 }
@@ -187,14 +177,10 @@
 - (NSMutableArray*)readFoldersToExclude{
     NSError *dataError;
     NSError *serializationError;
-    
     NSString *key = @"CacheFolders";
-    
     NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:@"Config" withExtension:@"plist"];
     NSData *data = [NSData dataWithContentsOfURL:url options:0 error:&dataError];
-    
     NSDictionary *dictionary = [NSPropertyListSerialization propertyListWithData:data options:0 format:nil error:&serializationError];
-    
     NSMutableArray *folderNames= [dictionary valueForKeyPath: key];
     
     if (folderNames == NULL) {
