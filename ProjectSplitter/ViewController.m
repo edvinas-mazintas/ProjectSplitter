@@ -105,6 +105,7 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
         NSString *editorVersionsString = [_editorVersions string];
         editorVersionsString = [self removeNewLines:editorVersionsString];
         NSArray *editorVersions = [editorVersionsString componentsSeparatedByString: @"\n"];
+        
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSOpenPanel* selectedDirectory = [self getOpenPanel:@"Choose Output Folder"];
         NSMutableArray *baseFolderURLS;
@@ -137,25 +138,15 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
                     for(int i = 0; i < [filteredURLS count]; i++){
                         NSURL *URLWithComponenent = [baseURL URLByAppendingPathComponent:[filteredURLS[i] lastPathComponent]];
 
-                        
                         [self removeItemIfExistsAtURL:fileManager url:URLWithComponenent];
-//                        if ([fileManager fileExistsAtPath: URLWithComponenent.path]) {
-//                            [fileManager removeItemAtURL:URLWithComponenent error:nil];
-//                        }
 
-                        if([fileManager copyItemAtURL:filteredURLS[i] toURL: URLWithComponenent error: &error]){
-                            // NSLog (@"File copied succesfully");
-                        }else{
-                            // NSLog (@"File copy failed");
+                        if(![fileManager copyItemAtURL:filteredURLS[i] toURL: URLWithComponenent error: &error]){
+                            [self logError:error stringToLog:@"Error copying file"];
                         }
                     }
                 }
             }
         }];
-        
-        if(error){
-            [self logError:error stringToLog:@"Error copying file"];
-        }
     }
 }
 
@@ -177,9 +168,12 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
 - (NSMutableArray*)readFoldersToExclude{
     NSError *dataError;
     NSError *serializationError;
+    
     NSString *key = @"CacheFolders";
+    
     NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:@"Config" withExtension:@"plist"];
     NSData *data = [NSData dataWithContentsOfURL:url options:0 error:&dataError];
+    
     NSDictionary *dictionary = [NSPropertyListSerialization propertyListWithData:data options:0 format:nil error:&serializationError];
     NSMutableArray *folderNames= [dictionary valueForKeyPath: key];
     
