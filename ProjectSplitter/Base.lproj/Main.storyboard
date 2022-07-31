@@ -722,7 +722,7 @@
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
                                                 <connections>
-                                                    <action selector="onClickInputButton:" target="XfG-lQ-9wD" id="WFI-La-ACl"/>
+                                                    <action selector="selectProjectDirectory:" target="XfG-lQ-9wD" id="WFI-La-ACl"/>
                                                 </connections>
                                             </button>
                                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CLc-Aq-Qcj" userLabel="FolderPathTextField">
@@ -767,7 +767,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="440" height="167"/>
                                         <clipView key="contentView" drawsBackground="NO" id="xD7-Va-SuJ">
                                             <rect key="frame" x="0.0" y="0.0" width="425" height="167"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" spellingCorrection="YES" smartInsertDelete="YES" id="Gmw-Xd-QqX">
                                                     <rect key="frame" x="0.0" y="0.0" width="425" height="167"/>
@@ -817,7 +817,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="onClickOutputButton:" target="XfG-lQ-9wD" id="p7w-yc-BSe"/>
+                                    <action selector="selectOutputDirectory:" target="XfG-lQ-9wD" id="p7w-yc-BSe"/>
                                 </connections>
                             </button>
                         </subviews>

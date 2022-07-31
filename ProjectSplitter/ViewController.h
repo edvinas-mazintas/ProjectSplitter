@@ -7,14 +7,20 @@
 
 #import <Cocoa/Cocoa.h>
 
-enum
-{
+//enum
+//{
+//    NO_FILTERING,
+//    FILTER_LIBRARY,
+//    FILTER_CONTENTS_OF_LIBRARY
+//} FilterOption;
+
+@interface ViewController : NSViewController
+
+typedef NS_ENUM(NSUInteger, FilterOption) {
     NO_FILTERING,
     FILTER_LIBRARY,
     FILTER_CONTENTS_OF_LIBRARY
-} FilterOption;
-
-@interface ViewController : NSViewController
+};
 
 @property (weak) IBOutlet NSButton *chooseFolderButton;
 @property (weak) IBOutlet NSTextField *pathToFolder;
@@ -24,8 +30,9 @@ enum
 @property NSString *path;
 @property NSURL *folderURL;
 @property NSMutableArray *foldersToExclude;
+@property FilterOption filterOption;
 
-- (void) setPathTextFieldTooltip: (NSString *) string;
+- (void) setPathTextFieldTooltip: (NSString *) aString;
 - (void) openDirectorySelectionPanel;
 
 @end
