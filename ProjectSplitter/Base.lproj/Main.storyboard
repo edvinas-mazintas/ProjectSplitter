@@ -767,7 +767,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="440" height="167"/>
                                         <clipView key="contentView" drawsBackground="NO" id="xD7-Va-SuJ">
                                             <rect key="frame" x="0.0" y="0.0" width="425" height="167"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" spellingCorrection="YES" smartInsertDelete="YES" id="Gmw-Xd-QqX">
                                                     <rect key="frame" x="0.0" y="0.0" width="425" height="167"/>
@@ -830,7 +830,7 @@
                     </view>
                     <connections>
                         <outlet property="ChooseFolderButton" destination="ILw-fn-28h" id="qDL-9f-mbY"/>
-                        <outlet property="editorVersions" destination="Gmw-Xd-QqX" id="1F3-nM-Sy2"/>
+                        <outlet property="editorVersions" destination="Gmw-Xd-QqX" id="urz-rb-Iab"/>
                         <outlet property="nukeCacheFolders" destination="lCh-23-NCw" id="6Hg-bc-uYL"/>
                         <outlet property="nukeLibrary" destination="PWg-9E-TK8" id="rKm-iW-nyq"/>
                         <outlet property="pathToFolder" destination="CLc-Aq-Qcj" id="yQx-V2-dvQ"/>
