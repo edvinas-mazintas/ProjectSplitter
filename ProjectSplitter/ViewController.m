@@ -6,6 +6,13 @@
 //
 
 #import "ViewController.h"
+#import <CocoaLumberjack/CocoaLumberjack.h>
+
+#if DEBUG
+    static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
+#else
+    static const DDLogLevel ddLogLevel = DDLogLevelWarning;
+#endif
 
 
 @implementation ViewController
@@ -14,6 +21,7 @@
     [super viewDidLoad];
     _foldersToExclude = [self readFoldersToExclude];
     [self setPathTextFieldTooltip:[_pathToFolder stringValue]];
+    [self setupLogger];
 }
 
 - (void)setRepresentedObject:(id)representedObject {
@@ -45,6 +53,7 @@
             [self setPathTextFieldTooltip: self->_path];
         }
     }];
+    
 }
 
 - (IBAction)onClickInputButton:(NSButton *)sender {
@@ -92,7 +101,7 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
         [self removeItemIfExistsAtURL:fileManager url:url];
         
         if(![fileManager createDirectoryAtPath: url.path withIntermediateDirectories:YES attributes:nil error:error]) {
-            [self logError:*error stringToLog:@"Failed to create directory"];
+            DDLogError(@"Failed to create directory: %@", *error);
         }
     }
 }
@@ -127,6 +136,7 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
                 
                 NSMutableArray *fileURLS = [theFiles mutableCopy];
                 NSArray *filteredURLS;
+                
                 NSMutableArray *arr = [NSMutableArray array];
                 [arr addObject:@"Library"];
                 
@@ -135,13 +145,13 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
                 [self createBaseDirectories:baseFolderURLS editorVersions:editorVersions error:&error fileManager:fileManager outputURL:outputURL];
                 
                 for(NSURL *baseURL in baseFolderURLS){
-                    for(int i = 0; i < [filteredURLS count]; i++){
-                        NSURL *URLWithComponenent = [baseURL URLByAppendingPathComponent:[filteredURLS[i] lastPathComponent]];
+                    for(NSURL *fileURL in filteredURLS){
+                        NSURL *URLWithComponenent = [baseURL URLByAppendingPathComponent:[fileURL lastPathComponent]];
 
                         [self removeItemIfExistsAtURL:fileManager url:URLWithComponenent];
 
-                        if(![fileManager copyItemAtURL:filteredURLS[i] toURL: URLWithComponenent error: &error]){
-                            [self logError:error stringToLog:@"Error copying file"];
+                        if(![fileManager copyItemAtURL:fileURL toURL: URLWithComponenent error: &error]){
+                            DDLogError(@"Failed to copy file: %@", error);
                         }
                     }
                 }
@@ -160,11 +170,6 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
     FilterOption = FILTER_CONTENTS_OF_LIBRARY;
 }
 
-- (void)logError:(NSError *)error stringToLog:(NSString *) string {
-    NSLog(@"%@", string);
-    NSLog(@"%@", error);
-}
-
 - (NSMutableArray*)readFoldersToExclude{
     NSError *dataError;
     NSError *serializationError;
@@ -178,18 +183,25 @@ static void updateFilterOption(ViewController *object, NSMutableArray *arr, NSMu
     NSMutableArray *folderNames= [dictionary valueForKeyPath: key];
     
     if (folderNames == NULL) {
-        [self logError:nil stringToLog:@"Failed to read key \"CacheFolders\" from plist"];
+        DDLogError(@"Failed to read key \"CacheFolders\" from plist");
     }
     
     if(dataError){
-        [self logError:dataError stringToLog:@"Failed to read data from URL"];
+        DDLogError(@"Failed to read data from URL: %@ ", dataError);
     }
     
     if(serializationError){
-        [self logError:serializationError stringToLog:@"Failed to serialize plist"];
+        DDLogError(@"Failed to serialize plist: %@ ", serializationError);
     }
     
     return folderNames;
+}
+
+- (void)setupLogger{
+    [DDLog addLogger:[DDOSLogger sharedInstance]];
+    DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
+    fileLogger.rollingFrequency = 60 * 60 * 24;
+    [DDLog addLogger:fileLogger];
 }
 
 @end

@@ -50,7 +50,6 @@
 				CC15FAD1285CD747F3469015 /* Pods-ProjectSplitter.debug.xcconfig */,
 				8F7CFCFD275CE5EEC1E65F2D /* Pods-ProjectSplitter.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -343,6 +342,12 @@
 				DEVELOPMENT_TEAM = 4NY8LFSJ3T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"$(SOURCE_ROOT)/Pods/**/**",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -371,6 +376,12 @@
 				DEVELOPMENT_TEAM = 4NY8LFSJ3T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"$(SOURCE_ROOT)/Pods/**/**",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
