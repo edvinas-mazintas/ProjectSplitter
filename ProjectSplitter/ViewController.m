@@ -19,7 +19,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _foldersToExclude = [self readFoldersToExclude];
+    [self setFoldersToExclude:[self readFoldersToExclude]];
     [self setPathTextFieldTooltip:[_pathToFolder stringValue]];
     [self setupLogger];
 }
@@ -44,10 +44,10 @@
 - (void)openDirectorySelectionPanel {
     NSOpenPanel *selectedDirectory = [self directorySelectionPanel: @"Choose Project Folder"];
     
-    [selectedDirectory beginWithCompletionHandler:^(NSInteger result){
+    [selectedDirectory beginWithCompletionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK) {
-            self -> _folderURL = [[selectedDirectory URLs] objectAtIndex:0];
-            self->_path = [self -> _folderURL absoluteString];
+            self->_folderURL = [[selectedDirectory URLs] objectAtIndex:0];
+            self->_path = [self ->_folderURL absoluteString];
             self->_path = [self->_path substringFromIndex:7];
             [self->_pathToFolder setStringValue: self->_path];
             [self setPathTextFieldTooltip: self->_path];
@@ -133,7 +133,7 @@
     __block NSURL* outputURL;
     
     if ([_editorVersions.string isNotEqualTo: @""] && _editorVersions.string.length != 0) {
-        NSArray * editorVersions = [self versionArray];
+        NSArray *editorVersions = [self versionArray];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSOpenPanel *selectedDirectory = [self directorySelectionPanel:@"Choose Output Folder"];
         NSMutableArray *baseFolderURLS = [[NSMutableArray alloc] init];
